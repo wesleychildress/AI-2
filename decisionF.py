@@ -20,6 +20,9 @@ class decisionF:
         self.trackMapTemp = [['' for j in range(40)] for i in range(40)] #for keeping track of moves/walls
         self.portal = (0,0)
         self.start = (20,20)
+        self.position = (0,0)
+        self.next = (20,20)
+        self.secondRun = 0
         self.trackMapFinal = np.zeros((40, 40), dtype=int)
         self.exists = os.path.isfile('dump.txt')
         self.path = []
@@ -94,19 +97,33 @@ class decisionF:
         #print "last_direction: " , self.last_direction #to keep track of last directionself.
         #print "last_result: " , self.last_result
 
-
-        if self.path:
-            print("List is not empty")
-            print "Path   : " , self.path
-            os.remove('dump.txt')
-            sys.exit()
-
-        if not self.path:
-            print("List is empty")
-
-        #Didn't hit a wall and last move wasn't a portal
+        #Didn't hit a wall and last move wasn't a portal or second run
         if self.last_result == 'Success': #basicly keep it moving until hits wall
             self.put_trackMap_success()
+
+            if self.path: # If this is second Run
+                self.secondRun = 1
+                print("List is not empty")
+                self.position = self.next
+                self.next = self.path.pop()
+                if self.next[1] > self.position[1]:
+                    return self.directions[1]
+                elif self.next[1] < self.position[1]:
+                    return self.directions[2]
+                elif self.next[0] > self.position[0]:
+                    return self.directions[3]
+                elif self.next[0] < self.position[0]:
+                    return self.directions[4]
+                else:
+                    print "You screwed up!!!!" , self.path
+                    sys.exit()
+                    os.remove('dump.txt')
+                print "Path   : " , self.path
+
+
+            if not self.path:
+                print("List is empty")
+
             #the main deal hear is the "pivot" if the agent can't traverse rows any longer
             if self.pivot == 'up': #traversing the tile map one row at a time moving upwards
                 if self.last_direction == 'up': #('up')
@@ -253,6 +270,9 @@ class decisionF:
                     return oops
 
         if self.last_result == 'Portal':
+            if self.secondRun:
+                os.remove('dump.txt')
+                sys.exit()
             if self.last_direction == "up":
                 self.portal = (self.trackRow-1,self.trackColumn)
                 self.trackMapFinal[self.trackRow-1][self.trackColumn] = 3
