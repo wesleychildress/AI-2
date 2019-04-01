@@ -2,6 +2,8 @@ import random
 import sys
 import numpy as np
 import collections
+import pickle
+import os
 
 #Decision Factory class
 class decisionF:
@@ -19,8 +21,12 @@ class decisionF:
         self.portal = (0,0)
         self.start = (20,20)
         self.trackMapFinal = np.zeros((40, 40), dtype=int)
-        self.queue = collections.deque([[self.start]])
-        self.seen = set([self.start])
+        self.exists = os.path.isfile('dump.txt')
+        self.path = []
+        if self.exists:
+            self.fileR = open('dump.txt', 'r')
+            self.path = pickle.load(self.fileR)
+            self.fileR.close()
 
     # origin @ (20,20) in 40x40 2d array (i'm sure there is a more "intelligent" way of doing this)
     def put_trackMap_success(self): # keeping track of tiles visited placing a 1 on success
@@ -88,8 +94,15 @@ class decisionF:
         #print "last_direction: " , self.last_direction #to keep track of last directionself.
         #print "last_result: " , self.last_result
 
-        if self.portal != (0, 0):
-            self.portal = (0,0)
+
+        if self.path:
+            print("List is not empty")
+            print "Path   : " , self.path
+            os.remove('dump.txt')
+            sys.exit()
+
+        if not self.path:
+            print("List is empty")
 
         #Didn't hit a wall and last move wasn't a portal
         if self.last_result == 'Success': #basicly keep it moving until hits wall
@@ -261,10 +274,11 @@ class decisionF:
             print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapFinal]))
             print "Portal : " , self.portal
             print "Path   : " , self.path
-            self.tits = self.path.pop()
-            print "Path   : " , self.tits
-            print "Path   : " , self.path
+            self.pop = self.path.pop()
 
+            self.fileW = open('dump.txt', 'w')
+            pickle.dump(self.path, self.fileW)
+            self.fileW.close()
 
             sys.exit()
 
