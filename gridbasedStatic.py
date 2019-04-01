@@ -111,25 +111,25 @@ class moveHero():                    #Characters can move around and do cool stu
     def PortalCheck(self, decision):      #checks portal relative to player
         if decision == "up":
             if Map.tileMap[Map.heroRow-1][Map.heroColumn] == 3:
-                DF.put_result('portal')
+                DF.put_result('Portal')
                 print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "down":
             if Map.tileMap[Map.heroRow+1][Map.heroColumn] == 3:
-                DF.put_result('portal')
+                DF.put_result('Portal')
                 print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "right":
             if Map.tileMap[Map.heroRow][Map.heroColumn+1] == 3:
-                DF.put_result('portal')
+                DF.put_result('Portal')
                 print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "left":
             if Map.tileMap[Map.heroRow][Map.heroColumn-1] == 3:
-                DF.put_result('portal')
+                DF.put_result('Portal')
                 print "Number of decisions: " + str(decisionCount)
                 return True
 
