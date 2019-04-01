@@ -72,12 +72,12 @@ class decisionF:
     def bfs(self):
         width = 40
         height = 40
-        queue = collections.deque([[self.start]])
-        seen = set([self.start])
+        queue = collections.deque([[self.portal]])
+        seen = set([self.portal])
         while queue:
             pathTemp = queue.popleft()
             x, y = pathTemp[-1]
-            if self.trackMapFinal[x][y] == 3:
+            if self.trackMapFinal[x][y] == 5:
                 return pathTemp
             for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
                 if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[x2][y2] != 0 and self.trackMapFinal[x2][y2] != 1 and (x2, y2) not in seen:
@@ -85,9 +85,11 @@ class decisionF:
                     seen.add((x2, y2))
 
     def better_direction(self): # better than random decision
-        print "last_direction: " , self.last_direction #to keep track of last directionself.
-        print "last_result: " , self.last_result
+        #print "last_direction: " , self.last_direction #to keep track of last directionself.
+        #print "last_result: " , self.last_result
 
+        if self.portal != (0, 0):
+            self.portal = (0,0)
 
         #Didn't hit a wall and last move wasn't a portal
         if self.last_result == 'Success': #basicly keep it moving until hits wall
@@ -254,10 +256,13 @@ class decisionF:
                 self.portal = (self.trackRow,self.trackColumn-1)
                 self.trackMapFinal[self.trackRow][self.trackColumn-1] = 3
                 self.trackColumn = self.trackColumn-1
-            self.path = self.bfs()
             self.trackMapFinal[20][20] = 5
+            self.path = self.bfs()
             print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapFinal]))
             print "Portal : " , self.portal
+            print "Path   : " , self.path
+            self.tits = self.path.pop()
+            print "Path   : " , self.tits
             print "Path   : " , self.path
 
 
