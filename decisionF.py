@@ -21,7 +21,7 @@ class decisionF:
         self.portal = (0,0)
         self.start = (20,20)
         self.position = (0,0)
-        self.next = (20,20)
+        self.next = (21,20)
         self.secondRun = 0
         self.trackMapFinal = np.zeros((40, 40), dtype=int)
         self.exists = os.path.isfile('dump.txt')
@@ -29,6 +29,9 @@ class decisionF:
         if self.exists:
             self.fileR = open('dump.txt', 'r')
             self.path = pickle.load(self.fileR)
+            self.fileR.close()
+            self.fileR = open('dump2.txt', 'r')
+            self.secondRun = pickle.load(self.fileR)
             self.fileR.close()
 
     # origin @ (20,20) in 40x40 2d array (i'm sure there is a more "intelligent" way of doing this)
@@ -49,7 +52,6 @@ class decisionF:
             self.trackMapTemp[self.trackRow][self.trackColumn-1] = 2
             self.trackMapFinal[self.trackRow][self.trackColumn-1] = 2
             self.trackColumn = self.trackColumn-1
-        print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapTemp]))
 
     def put_trackMap_wall(self): # keeping track of tiles of walls placing a 2
         if self.last_direction == "up":
@@ -64,10 +66,17 @@ class decisionF:
         elif self.last_direction == "left":
             self.trackMapTemp[self.trackRow][self.trackColumn-1] = 1
             self.trackMapFinal[self.trackRow][self.trackColumn-1] = 1
-        print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapTemp]))
 
     def get_decision(self, verbose = True): #return move to framework
-        return self.better_direction()
+        if self.last_result == 'Portal':
+            self.port()
+
+        if self.secondRun: # If this is second Run
+            return self.second()
+
+
+        if not self.path:
+            return self.better_direction()
 
     def random_direction(self): #for random decision
         r = random.randint(1,4)
@@ -76,72 +85,78 @@ class decisionF:
 
     def put_result(self, result): #keep track of last result
         self.last_result = result
-        print "Result : " , self.last_result #to see last result
 
     def bfs(self):
         width = 40
         height = 40
-        queue = collections.deque([[self.portal]])
-        seen = set([self.portal])
+        queue = collections.deque([[self.start]])
+        seen = set([self.start])
         while queue:
             pathTemp = queue.popleft()
             x, y = pathTemp[-1]
-            if self.trackMapFinal[x][y] == 5:
+            if self.trackMapFinal[x][y] == 3:
                 return pathTemp
             for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
                 if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[x2][y2] != 0 and self.trackMapFinal[x2][y2] != 1 and (x2, y2) not in seen:
                     queue.append(pathTemp + [(x2, y2)])
                     seen.add((x2, y2))
 
-    def better_direction(self): # better than random decision
-        #print "last_direction: " , self.last_direction #to keep track of last directionself.
-        #print "last_result: " , self.last_result
+    def second(self):
+        self.position = self.next
+        self.next = self.path.pop(0)
 
-        if self.path: # If this is second Run
-            self.secondRun = 1
-            print("List is not empty")
-            self.position = self.next
-            self.next = self.path.pop()
-            print "Next y       : " , self.next[1]
-            print "position y   : " , self.position[1]
-            print "Next x       : " , self.next[0]
-            print "position x   : " , self.position[0]
-            self.position = self.next
-            self.next = self.path.pop()
-            print "Next y       : " , self.next[1]
-            print "position y   : " , self.position[1]
-            print "Next x       : " , self.next[0]
-            print "position x   : " , self.position[0]
-            self.position = self.next
-            self.next = self.path.pop()
-            print "Next y   : " , self.next[1]
-            print "position y   : " , self.position[1]
-            print "Next x       : " , self.next[0]
-            print "position x   : " , self.position[0]
-            self.position = self.next
-            self.next = self.path.pop()
-            print "Next y       : " , self.next[1]
-            print "position y   : " , self.position[1]
-            print "Next x       : " , self.next[0]
-            print "position x   : " , self.position[0]
+        if self.next[0] < self.position[0]:
+            return self.directions[1]
+        elif self.next[0] > self.position[0]:
+            return self.directions[2]
+        elif self.next[1] > self.position[1]:
+            return self.directions[3]
+        elif self.next[1] < self.position[1]:
+            return self.directions[4]
+        else:
+            print "You screwed up!!!!" , self.path
             sys.exit()
-            if self.next[1] > self.position[1]:
-                return self.directions[1]
-            elif self.next[1] < self.position[1]:
-                return self.directions[2]
-            elif self.next[0] > self.position[0]:
-                return self.directions[3]
-            elif self.next[0] < self.position[0]:
-                return self.directions[4]
-            else:
-                print "You screwed up!!!!" , self.path
-                sys.exit()
-                os.remove('dump.txt')
-            print "Path   : " , self.path
+            os.remove('dump.txt')
+            os.remove('dump2.txt')
 
+    def port(self): #when portal is found do some stuff
+        if self.secondRun: #remove variable files
+            os.remove('dump.txt')
+            os.remove('dump2.txt')
+            sys.exit()
+        if self.last_direction == "up":
+            self.portal = (self.trackRow-1,self.trackColumn)
+            self.trackMapFinal[self.trackRow-1][self.trackColumn] = 3
+            self.trackRow = self.trackRow-1
+        elif self.last_direction == "down":
+            self.portal = (self.trackRow+1,self.trackColumn)
+            self.trackMapFinal[self.trackRow+1][self.trackColumn] = 3
+            self.trackRow = self.trackRow+1
+        elif self.last_direction == "right":
+            self.portal = (self.trackRow,self.trackColumn+1)
+            self.trackMapFinal[self.trackRow][self.trackColumn+1] = 3
+            self.trackColumn = self.trackColumn+1
+        elif self.last_direction == "left":
+            self.portal = (self.trackRow,self.trackColumn-1)
+            self.trackMapFinal[self.trackRow][self.trackColumn-1] = 3
+            self.trackColumn = self.trackColumn-1
+        self.trackMapFinal[20][20] = 5 #for us to visualize when printing matrix
 
-        if not self.path:
-            print("List is empty")
+        #set path for second run
+        self.path = self.bfs()
+        self.secondRun = 1
+
+        #save to file for second run
+        self.fileW = open('dump.txt', 'w')
+        pickle.dump(self.path, self.fileW)
+        self.fileW.close()
+        self.fileW = open('dump2.txt', 'w')
+        pickle.dump(self.secondRun, self.fileW)
+        self.fileW.close()
+
+        sys.exit()
+
+    def better_direction(self): # better than random decision
 
         #Didn't hit a wall and last move wasn't a portal or second run
         if self.last_result == 'Success': #basicly keep it moving until hits wall
@@ -201,8 +216,6 @@ class decisionF:
             self.put_trackMap_wall()
             if self.pivot == 'up': #traversing the tile map one row at a time moving upwards
                 if self.last_direction == 'up': #can't search rows upwards any longer
-                    #self.trackRow = 20 #reset row origin
-                    #self.trackColumn = 20 #reset column origin
                     self.trackMapTemp = [['' for j in range(40)] for i in range(40)] #clear the "trackMapTemp"
                     self.pivot = 'down' #switch the piviot to search rows heading downwards
                     self.last_direction = self.directions[2]
@@ -224,12 +237,10 @@ class decisionF:
                     return oops
             if self.pivot == 'down':
                 if self.last_direction == 'down': #can't search rows downwards any longer
-                    #self.trackRow = 20 #reset row origin
-                    #self.trackColumn = 20 #reset column origin
                     self.trackMapTemp = [['' for j in range(40)] for i in range(40)]
                     self.pivot = 'right' #switch the piviot to search columns heading right
                     self.last_direction = self.directions[1]
-                    return self.directions[1] #******************** where comments stop ********************************
+                    return self.directions[1]
                 elif self.last_direction == 'up':
                     if self.switchx == 'right':
                         self.switchx = 'left'
@@ -247,8 +258,6 @@ class decisionF:
                     return oops
             if self.pivot == 'right':
                 if self.last_direction == 'right':
-                    #self.trackRow = 20
-                    #self.trackColumn = 20
                     self.trackMapTemp = [['' for j in range(40)] for i in range(40)]
                     self.pivot = 'left'
                     self.last_direction = self.directions[4]
@@ -270,8 +279,6 @@ class decisionF:
                     return oops
             if self.pivot == 'left':
                 if self.last_direction == 'left':
-                    #self.trackRow = 20
-                    #self.trackColumn = 20
                     self.trackMapTemp = [['' for j in range(40)] for i in range(40)]
                     self.pivot = 'up'
                     self.last_direction = self.directions[1]
@@ -291,40 +298,6 @@ class decisionF:
                 else:
                     oops = self.random_direction() #if all else fails generate a random decision
                     return oops
-
-        if self.last_result == 'Portal':
-            if self.secondRun:
-                os.remove('dump.txt')
-                sys.exit()
-            if self.last_direction == "up":
-                self.portal = (self.trackRow-1,self.trackColumn)
-                self.trackMapFinal[self.trackRow-1][self.trackColumn] = 3
-                self.trackRow = self.trackRow-1
-            elif self.last_direction == "down":
-                self.portal = (self.trackRow+1,self.trackColumn)
-                self.trackMapFinal[self.trackRow+1][self.trackColumn] = 3
-                self.trackRow = self.trackRow+1
-            elif self.last_direction == "right":
-                self.portal = (self.trackRow,self.trackColumn+1)
-                self.trackMapFinal[self.trackRow][self.trackColumn+1] = 3
-                self.trackColumn = self.trackColumn+1
-            elif self.last_direction == "left":
-                self.portal = (self.trackRow,self.trackColumn-1)
-                self.trackMapFinal[self.trackRow][self.trackColumn-1] = 3
-                self.trackColumn = self.trackColumn-1
-            self.trackMapFinal[20][20] = 5
-            self.path = self.bfs()
-            print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapFinal]))
-            print "Portal : " , self.portal
-            print "Path   : " , self.path
-            self.pop = self.path.pop()
-
-            self.fileW = open('dump.txt', 'w')
-            pickle.dump(self.path, self.fileW)
-            self.fileW.close()
-
-            sys.exit()
-
 
         else:
             oops = self.random_direction()

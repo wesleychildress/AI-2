@@ -34,74 +34,73 @@ decisionCount = 0
 class moveHero():                    #Characters can move around and do cool stuff
     global Done
     def Move(self, decision):
-
         if decision == "up":
             if self.CollisionCheck("up") == False:          #And nothing in the way
                     if self.PortalCheck("up") == True:
                         Done = True
                         DF.put_result('Portal')
+                        print "Portal Found"
+                        print "Decisions: " + str(decisionCount)
                     elif self.PortalCheck("up") == False:     #No Portal
                        # DF.put_check('No portal')
                         Map.tileMap[Map.heroRow-1][Map.heroColumn] = 2
                         Map.tileMap[Map.heroRow][Map.heroColumn] = 0
                         Map.heroRow = Map.heroRow-1
-                        print "Direction:", decision
                         DF.put_result('Success')
         elif decision == "down":
             if self.CollisionCheck("down") == False:          #And nothing in the way
                     if self.PortalCheck("down") == True:     #Portal
                         Done = True
                         DF.put_result('Portal')
+                        print "Portal Found"
+                        print "Decisions: " + str(decisionCount)
                     if self.PortalCheck("down") == False:     #No Portal
                       #  DF.put_check('No portal')
                         Map.tileMap[Map.heroRow+1][Map.heroColumn] = 2
                         Map.tileMap[Map.heroRow][Map.heroColumn] = 0
                         Map.heroRow = Map.heroRow+1
-                        print "Direction:", decision
                         DF.put_result('Success')
         elif decision == "right":
             if self.CollisionCheck("right") == False:          #And nothing in the way
                     if self.PortalCheck("right") == True:     #No Portal
                         Done = True
                         DF.put_result('Portal')
+                        print "Portal Found"
+                        print "Decisions: " + str(decisionCount)
                     if self.PortalCheck("right") == False:
                        # DF.put_check('No portal')
                         Map.tileMap[Map.heroRow][Map.heroColumn+1] = 2
                         Map.tileMap[Map.heroRow][Map.heroColumn] = 0
                         Map.heroColumn = Map.heroColumn+1
-                        print "Direction:", decision
                         DF.put_result('Success')
         elif decision == "left":
             if self.CollisionCheck("left") == False:          #And nothing in the way
                     if self.PortalCheck("left") == True:
                         Done = True
                         DF.put_result('Portal')
+                        print "Portal Found"
+                        print "Decisions: " + str(decisionCount)
                     if self.PortalCheck("left") == False:     #No Portal
                        # DF.put_check('No portal')
                         Map.tileMap[Map.heroRow][Map.heroColumn-1] = 2
                         Map.tileMap[Map.heroRow][Map.heroColumn] = 0
                         Map.heroColumn = Map.heroColumn-1
-                        print "Direction:", decision
                         DF.put_result('Success')
     def CollisionCheck(self, decision):
         if decision == "up":
             if Map.tileMap[Map.heroRow-1][Map.heroColumn] == 1:
-                print "Direction:", decision
                 DF.put_result('wall')
                 return True
         if decision == "down":
             if Map.tileMap[Map.heroRow+1][Map.heroColumn] == 1:
-                print "Direction:", decision
                 DF.put_result('wall')
                 return True
         if decision == "right":
             if Map.tileMap[Map.heroRow][Map.heroColumn+1] == 1:
-                print "Direction:", decision
                 DF.put_result('wall')
                 return True
         if decision == "left":
             if Map.tileMap[Map.heroRow][Map.heroColumn-1] == 1:
-                print "Direction:", decision
                 DF.put_result('wall')
                 return True
        # print "Direction:", decision
@@ -111,26 +110,18 @@ class moveHero():                    #Characters can move around and do cool stu
     def PortalCheck(self, decision):      #checks portal relative to player
         if decision == "up":
             if Map.tileMap[Map.heroRow-1][Map.heroColumn] == 3:
-                DF.put_result('Portal')
-                print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "down":
             if Map.tileMap[Map.heroRow+1][Map.heroColumn] == 3:
-                DF.put_result('Portal')
-                print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "right":
             if Map.tileMap[Map.heroRow][Map.heroColumn+1] == 3:
-                DF.put_result('Portal')
-                print "Number of decisions: " + str(decisionCount)
                 return True
 
         if decision == "left":
             if Map.tileMap[Map.heroRow][Map.heroColumn-1] == 3:
-                DF.put_result('Portal')
-                print "Number of decisions: " + str(decisionCount)
                 return True
 
         return False
@@ -159,7 +150,7 @@ class Map(object):              #The main class
 
     while True:  #make sure gansta doesn't get beemed up at beginning
         randomPortalRow = 2  #random.randint(1, mapSize - 2)
-        randomPortalColumn = 8 #random.randint(1, mapSize - 2)
+        randomPortalColumn = 7 #random.randint(1, mapSize - 2)
         if randomPortalRow != randomHeroRow & randomPortalColumn != randomHeroColumn:
             break
     #Place portal
@@ -218,7 +209,7 @@ while not Done:     #Main pygame loop
     pygame.display.update()
 
 
-    clock.tick(20)      #speed of the tile
+    clock.tick(30)      #speed of the tile
     pygame.display.flip()
 
 pygame.quit()
