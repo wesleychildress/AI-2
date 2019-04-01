@@ -80,7 +80,7 @@ class decisionF:
             if self.trackMapFinal[x][y] == 3:
                 return pathTemp
             for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
-                if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[x2][y2] != (1 or 0) and (x2, y2) not in seen:
+                if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[x2][y2] != 0 and self.trackMapFinal[x2][y2] != 1 and (x2, y2) not in seen:
                     queue.append(pathTemp + [(x2, y2)])
                     seen.add((x2, y2))
 
