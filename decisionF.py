@@ -23,10 +23,10 @@ class decisionF:
         self.position = (0,0)
         self.next = (21,20)
         self.secondRun = 0
-        self.trackMapFinal = np.zeros((40, 40), dtype=int)
-        self.exists = os.path.isfile('dump.txt')
+        self.trackMapFinal = np.zeros((40, 40), dtype=int) #final Matrix
+        self.exists = os.path.isfile('dump.txt') # if file exists invoke second run
         self.path = []
-        if self.exists:
+        if self.exists: # set variables for second run
             self.fileR = open('dump.txt', 'r')
             self.path = pickle.load(self.fileR)
             self.fileR.close()
@@ -86,7 +86,7 @@ class decisionF:
     def put_result(self, result): #keep track of last result
         self.last_result = result
 
-    def bfs(self):
+    def bfs(self): # search for portal and place cord in queue
         width = 40
         height = 40
         queue = collections.deque([[self.start]])
@@ -101,9 +101,9 @@ class decisionF:
                     queue.append(pathTemp + [(x2, y2)])
                     seen.add((x2, y2))
 
-    def second(self):
+    def second(self): # this is the move function for second run
         self.position = self.next
-        self.next = self.path.pop(0)
+        self.next = self.path.pop(0) # de-queue for next move
 
         if self.next[0] < self.position[0]:
             return self.directions[1]
@@ -124,7 +124,7 @@ class decisionF:
             os.remove('dump.txt')
             os.remove('dump2.txt')
             sys.exit()
-        if self.last_direction == "up":
+        if self.last_direction == "up": #next couple of if/else set portal in matrix for BFS search
             self.portal = (self.trackRow-1,self.trackColumn)
             self.trackMapFinal[self.trackRow-1][self.trackColumn] = 3
             self.trackRow = self.trackRow-1
