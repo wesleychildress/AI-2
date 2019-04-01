@@ -25,28 +25,36 @@ class decisionF:
     # origin @ (20,20) in 40x40 2d array (i'm sure there is a more "intelligent" way of doing this)
     def put_trackMap_success(self): # keeping track of tiles visited placing a 1 on success
         if self.last_direction == "up":
-            self.trackMapTemp[self.trackRow-1][self.trackColumn] = 1
+            self.trackMapTemp[self.trackRow-1][self.trackColumn] = 2
+            self.trackMapFinal[self.trackRow-1][self.trackColumn] = 2
             self.trackRow = self.trackRow-1
         elif self.last_direction == "down":
-            self.trackMapTemp[self.trackRow+1][self.trackColumn] = 1
+            self.trackMapTemp[self.trackRow+1][self.trackColumn] = 2
+            self.trackMapFinal[self.trackRow+1][self.trackColumn] = 2
             self.trackRow = self.trackRow+1
         elif self.last_direction == "right":
-            self.trackMapTemp[self.trackRow][self.trackColumn+1] = 1
+            self.trackMapTemp[self.trackRow][self.trackColumn+1] = 2
+            self.trackMapFinal[self.trackRow][self.trackColumn+1] = 2
             self.trackColumn = self.trackColumn+1
         elif self.last_direction == "left":
-            self.trackMapTemp[self.trackRow][self.trackColumn-1] = 1
+            self.trackMapTemp[self.trackRow][self.trackColumn-1] = 2
+            self.trackMapFinal[self.trackRow][self.trackColumn-1] = 2
             self.trackColumn = self.trackColumn-1
         print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapTemp]))
 
     def put_trackMap_wall(self): # keeping track of tiles of walls placing a 2
         if self.last_direction == "up":
-            self.trackMapTemp[self.trackRow-1][self.trackColumn] = 2
+            self.trackMapTemp[self.trackRow-1][self.trackColumn] = 1
+            self.trackMapFinal[self.trackRow-1][self.trackColumn] = 1
         elif self.last_direction == "down":
-            self.trackMapTemp[self.trackRow+1][self.trackColumn] = 2
+            self.trackMapTemp[self.trackRow+1][self.trackColumn] = 1
+            self.trackMapFinal[self.trackRow+1][self.trackColumn] = 1
         elif self.last_direction == "right":
-            self.trackMapTemp[self.trackRow][self.trackColumn+1] = 2
+            self.trackMapTemp[self.trackRow][self.trackColumn+1] = 1
+            self.trackMapFinal[self.trackRow][self.trackColumn+1] = 1
         elif self.last_direction == "left":
-            self.trackMapTemp[self.trackRow][self.trackColumn-1] = 2
+            self.trackMapTemp[self.trackRow][self.trackColumn-1] = 1
+            self.trackMapFinal[self.trackRow][self.trackColumn-1] = 1
         print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapTemp]))
 
     def get_decision(self, verbose = True): #return move to framework
@@ -72,8 +80,8 @@ class decisionF:
             if self.trackMapFinal[x][y] == 3:
                 return pathTemp
             for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
-                if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[y2][x2] != 1 and (x2, y2) not in seen:
-                    queue.append(pathTemp + [(y2, x2)])
+                if 0 <= x2 < width and 0 <= y2 < height and self.trackMapFinal[x2][y2] != (1 or 0) and (x2, y2) not in seen:
+                    queue.append(pathTemp + [(x2, y2)])
                     seen.add((x2, y2))
 
     def better_direction(self): # better than random decision
@@ -247,6 +255,7 @@ class decisionF:
                 self.trackMapFinal[self.trackRow][self.trackColumn-1] = 3
                 self.trackColumn = self.trackColumn-1
             self.path = self.bfs()
+            self.trackMapFinal[20][20] = 5
             print('\n'.join([''.join(['{:2}'.format(item) for item in row]) for row in self.trackMapFinal]))
             print "Portal : " , self.portal
             print "Path   : " , self.path

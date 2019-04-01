@@ -45,3 +45,8 @@ while not frontier.empty():
                                    self.trackMapFinal = np.arange(1600).reshape(40, 40)
                                    self.queue = collections.deque([[self.start]])
                                    self.seen = set([self.start])
+
+
+                                   Portal :  (15, 26)
+                                   Path   :  [(20, 20), (20, 21), (21, 19), (19, 22), (22, 18), (18, 23), (23, 17), (17, 24), (24, 16), (16, 25), (25, 15), (15, 26)]
+                                  
