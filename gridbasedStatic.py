@@ -149,7 +149,7 @@ class Map(object):              #The main class
     heroColumn = randomHeroColumn
 
     while True:  #make sure gansta doesn't get beemed up at beginning
-        randomPortalRow = 2  #random.randint(1, mapSize - 2)
+        randomPortalRow = 1  #random.randint(1, mapSize - 2)
         randomPortalColumn = 7 #random.randint(1, mapSize - 2)
         if randomPortalRow != randomHeroRow & randomPortalColumn != randomHeroColumn:
             break
