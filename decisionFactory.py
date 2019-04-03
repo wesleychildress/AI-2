@@ -6,13 +6,13 @@ import pickle
 import os
 
 #Decision Factory class
-class decisionF:
+class decisionFactory:
     def __init__ ( self, name= 'Davros' ):
         self.name = name
         self.directions = [ 'wait', 'up', 'down', 'right', 'left' ]
-        self.last_result = 'Success'
+        self.last_result = ' '
         self.last_direction = 'down' #stores last direction moved
-        self.switchx = 'right' #for switching directions left or right
+        self.switchx = 'left' #for switching directions left or right
         self.switchy = 'up' #for switching directions up or down
         self.pivot = 'up' #switching directions
         self.trackRow = 20 #for origin
@@ -21,7 +21,7 @@ class decisionF:
         self.portal = (0,0)
         self.start = (20,20)
         self.position = (0,0)
-        self.next = (21,20)
+        self.next = (20,20)
         self.secondRun = 0
         self.trackMapFinal = np.zeros((40, 40), dtype=int) #final Matrix
         self.exists = os.path.isfile('dump.txt') # if file exists invoke second run
@@ -115,9 +115,9 @@ class decisionF:
             return self.directions[4]
         else:
             print "You screwed up!!!!" , self.path
-            sys.exit()
             os.remove('dump.txt')
             os.remove('dump2.txt')
+            sys.exit()
 
     def port(self): #when portal is found do some stuff
         if self.secondRun: #remove variable files
@@ -145,6 +145,7 @@ class decisionF:
         #set path for second run
         self.path = self.bfs()
         self.secondRun = 1
+        self.pop = self.path.pop(0) # de-queue starting position
 
         #save to file for second run
         self.fileW = open('dump.txt', 'w')
@@ -201,6 +202,18 @@ class decisionF:
                     return self.last_direction
             if self.pivot == 'left': #traversing the tile map one column at a time heading left
                 if self.last_direction == 'left': #('left'):
+                    if self.switchy == 'up':
+                        self.switchy = 'down'
+                        self.last_direction = self.directions[2]
+                        return self.directions[2] #start moving downward
+                    elif self.switchy == 'down':
+                        self.switchy = 'up'
+                        self.last_direction = self.directions[1]
+                        return self.directions[1] #start moving upward
+                else: #keeps going left until hits wall
+                    return self.last_direction
+            if self.pivot == '  ': #traversing the tile map one column at a time heading left
+                if self.last_direction == '': #('left'):
                     if self.switchy == 'up':
                         self.switchy = 'down'
                         self.last_direction = self.directions[2]
@@ -298,7 +311,5 @@ class decisionF:
                 else:
                     oops = self.random_direction() #if all else fails generate a random decision
                     return oops
-
-        else:
-            oops = self.random_direction()
-            return oops
+        if self.last_result == ' ':
+            return self.directions[2]

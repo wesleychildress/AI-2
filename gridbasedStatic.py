@@ -3,7 +3,7 @@
 import random
 import pygame, sys
 from pygame.locals import *
-from decisionF import decisionF
+from decisionFactory import decisionFactory
 
 #colors
 BLACK = (0, 0, 0 )
@@ -160,7 +160,7 @@ class Map(object):              #The main class
 
 
 Map = Map()
-DF = decisionF()
+DF = decisionFactory()
 turd = moveHero()
 
 
@@ -209,7 +209,7 @@ while not Done:     #Main pygame loop
     pygame.display.update()
 
 
-    clock.tick(30)      #speed of the tile
+    clock.tick(20)      #speed of the tile
     pygame.display.flip()
 
 pygame.quit()
