@@ -135,7 +135,7 @@ class Map(object):              #The main class
                 [1,0,0,0,0,0,1,0,0,1],
                 [1,1,1,1,0,0,1,0,0,1],
                 [1,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,0,0,0,1],
+                [1,1,1,1,0,0,0,0,0,1],
                 [1,0,0,0,0,0,1,1,1,1],
                 [1,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,0,0,1],
@@ -150,7 +150,7 @@ class Map(object):              #The main class
 
     while True:  #make sure gansta doesn't get beemed up at beginning
         randomPortalRow = 1  #random.randint(1, mapSize - 2)
-        randomPortalColumn = 7 #random.randint(1, mapSize - 2)
+        randomPortalColumn = 1 #random.randint(1, mapSize - 2)
         if randomPortalRow != randomHeroRow & randomPortalColumn != randomHeroColumn:
             break
     #Place portal
